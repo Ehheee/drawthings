@@ -12,55 +12,55 @@ import thething.drawthings.noise.SimpleNoise;
 
 public class DrawingCalculator {
 
-	BufferedImage canvas;
+	private BufferedImage canvas;
+	private String[] args;
 	
-	public DrawingCalculator(Dimension size){
+	
+	public DrawingCalculator(Dimension size, String[] args) {
 		canvas = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
-		
 	}
-	public void paint(Graphics g){
+	public DrawingCalculator(String[] args) {
+		this.args = args;
+	}
+	public void setSize(Dimension size) {
+		canvas = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
+	}
+	public void paint(Graphics g, String type){
+		
 		Graphics2D g2 = (Graphics2D) g;
-		
-		
-		int maxY = canvas.getHeight();
-		int maxX = canvas.getWidth();
-		for(int x = 0; x < maxX;x++){
-			for(int y = 0; y < maxY;y++){
-				Color color = getColorForPoint2(x, y);
-				
-				canvas.setRGB(x, y, color.getRGB());
-			}
-		}
-		
-		//paintNoise();
-		g2.drawImage(canvas, null, null);
-		
-		//g2.drawString("it works", 10, 20);
-	}
-	
-	private void paintNoise(){
-		NoiseFunctions noiseFuncs = new NoiseFunctions();
 		int maxY = canvas.getHeight();
 		int maxX = canvas.getWidth();
 		SimpleNoise simpleNoise = new SimpleNoise(256, maxY, maxX);
-		for(int x = 0; x < maxX; x++){
-			for(int y = 0; y < maxY; y++){
-				//double noise = noiseFuncs.simpleNoise(x*10, y*10, simpleNoise);
-				//double noise = noiseFuncs.fractalNoise(x, y, simpleNoise, 1, 7);
-				double noise = noiseFuncs.marbleNoise(x, y, simpleNoise);
-				int color = (int)(noise * 255);
-				canvas.setRGB(x, y, new Color(color, color, color).getRGB());
+		for(int x = 0; x < maxX;x++) {
+			for(int y = 0; y < maxY;y++) {
+				Color color;
+				if ("circle".equals(type)) {
+					color = checkCircle(x, y);
+				} else if ("random".equals(type)) {
+					color = checkRandom(x, y);
+				} else  if ("simpleNoise".equals(type)) {
+					int c = (int) (NoiseFunctions.simpleNoise(x, y, simpleNoise) * 255);
+					color = new Color(c, c, c);
+				} else if ("fractalNoise".equals(type)) {
+					//int c = (int) (NoiseFunctions.fractalNoise(x, y, simpleNoise, 1, 7) * 255);
+					int a = (args.length > 1 ? Integer.valueOf(args[1]): 1);
+					int b = (args.length > 2 ? Integer.valueOf(args[2]): 7);
+					int c = (int) (NoiseFunctions.fractalNoise(x, y, simpleNoise, a, b) * 255);
+					color = new Color(c, c, c);
+				} else if ("marbleNoise".equals(type)) {
+					int c = (int) (NoiseFunctions.marbleNoise(x, y, simpleNoise) * 255);
+					color = new Color(c, c, c);
+				} else {
+					color = new Color(7,7,7);
+				}
+				canvas.setRGB(x, y, color.getRGB());
+				
 			}
 		}
+		g2.drawImage(canvas, null, null);
 	}
 	
-
-	
-	
-	
-
-	
-	public Color getColorForPoint2(int x, int y){
+	public Color checkCircle(int x, int y){
 		Float smallX = (float) x / 10f;											//Controlles the size of the circles. The larger the divider, the smaller the circles
 		Float smallY = (float) y / 10f;
 		Color color = new Color(255, 255, 255);									//Sets the default color(white), which is only changed if the point is in the circle
@@ -77,19 +77,18 @@ public class DrawingCalculator {
 		float res = (smallX - h)*(smallX - h) + (smallY - k)*(smallY - k);		//Calculates the square radius that the circle that contains the given points would have
 		//System.out.println("h: " + h + " k: " + k);
 		//System.out.println("X: " + smallX + " Y: " + smallY + " res: " + res);
-		if(Math.abs(res - radius*radius) < linewidth){							//if the theoretical circle calculated in previous point falls into the correct circle with linewidth also considered
+		if (Math.abs(res - radius*radius) < linewidth){							//if the theoretical circle calculated in previous point falls into the correct circle with linewidth also considered
 			Random rand = new Random();
 			//Below code causes fat circle lines to be a bit more smoother. Also added a random element just for testing and fun
 			double fraction = 255 / linewidth;									
 			int c = (int) (fraction * (Math.abs(res - radius*radius)));
-			System.out.println(c);
 			color = new Color((int) (c*rand.nextDouble()), (int) (c*rand.nextDouble()), (int) (c*rand.nextDouble()));
 			
 		}
 		return color;
 	}
 	
-	public Color getColorForPoint1(int x, int y){
+	public Color checkRandom(int x, int y){
 		Float smallX = (float) x / 20f;
 		Float smallY = (float) y / 20f;
 		Color color = new Color(255, 255, 255);
