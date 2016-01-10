@@ -30,7 +30,13 @@ public class DrawingCalculator {
 		Graphics2D g2 = (Graphics2D) g;
 		int maxY = canvas.getHeight();
 		int maxX = canvas.getWidth();
-		SimpleNoise simpleNoise = new SimpleNoise(256, maxY, maxX);
+		Long seed;
+		if (args.length < 2 || "null".equals(args[1])) {
+			seed = null;
+		} else {
+			seed = Long.valueOf(args[1]);
+		}
+		SimpleNoise simpleNoise = new SimpleNoise(256, maxY, maxX, seed);
 		for(int x = 0; x < maxX;x++) {
 			for(int y = 0; y < maxY;y++) {
 				Color color;
@@ -42,9 +48,8 @@ public class DrawingCalculator {
 					int c = (int) (NoiseFunctions.simpleNoise(x, y, simpleNoise) * 255);
 					color = new Color(c, c, c);
 				} else if ("fractalNoise".equals(type)) {
-					//int c = (int) (NoiseFunctions.fractalNoise(x, y, simpleNoise, 1, 7) * 255);
-					int a = (args.length > 1 ? Integer.valueOf(args[1]): 1);
-					int b = (args.length > 2 ? Integer.valueOf(args[2]): 7);
+					int a = (args.length > 2 ? Integer.valueOf(args[2]): 1);
+					int b = (args.length > 3 ? Integer.valueOf(args[3]): 7);
 					int c = (int) (NoiseFunctions.fractalNoise(x, y, simpleNoise, a, b) * 255);
 					color = new Color(c, c, c);
 				} else if ("marbleNoise".equals(type)) {

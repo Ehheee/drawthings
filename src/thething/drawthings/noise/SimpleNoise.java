@@ -8,19 +8,26 @@ public class SimpleNoise {
 	private float[] randoms;
 	private int randomsSize, randomsMask;
 	private double invImageHeight, invImageWidth;
+	private Long seed;
 	
 	
-	public SimpleNoise(int randomsSize, int imageHeight, int imageWidth){
+	public SimpleNoise(int randomsSize, int imageHeight, int imageWidth, Long seed){
 		this.randomsSize = randomsSize;
 		this.randomsMask = randomsSize -1;
 		randoms = new float[randomsSize*randomsSize];
 		invImageHeight = 1.0/imageHeight;
 		invImageWidth = 1.0/imageWidth;
-		this.generateRandoms();
+		this.seed = seed;
+		this.generateRandoms(seed);
 	}
 	
-	private void generateRandoms(){
-		Random random = new Random(152L);
+	private void generateRandoms(Long seed){
+		Random random;
+		if (seed != null) {
+			random = new Random(seed);
+		} else {
+			random = new Random();
+		}
 		for(int i = 0; i < randomsSize*randomsSize; i++){
 			randoms[i] = random.nextFloat();
 		}
