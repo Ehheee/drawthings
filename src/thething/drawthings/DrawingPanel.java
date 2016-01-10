@@ -25,7 +25,7 @@ public class DrawingPanel extends JPanel{
 		
 	}
 	public Dimension getPreferredSize() {
-		return new Dimension(100, 100);
+		return new Dimension(600, 600);
 	}
 	public void paintComponent(Graphics g) {
 		calc.setSize(getSize());
